@@ -2,8 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Users, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import CommunityInput from '../components/CommunityInput';
-import CommunityPost from '../components/CommunityPost';
 import { getCommunityPosts, createPost } from '../services/communityApi';
 
 interface Post {
@@ -12,6 +10,44 @@ interface Post {
   author: string;
   timestamp: string;
 }
+
+const CommunityPost: React.FC<{ post: Post }> = ({ post }) => {
+  return (
+    <div className="bg-white p-4 rounded shadow mb-4">
+      <div className="text-sm text-gray-500 mb-1">{post.author} • {new Date(post.timestamp).toLocaleString()}</div>
+      <div className="text-gray-800 text-base">{post.content}</div>
+    </div>
+  );
+};
+
+const CommunityInput: React.FC<{ onPost: (content: string) => void; isLoading: boolean }> = ({ onPost, isLoading }) => {
+  const [input, setInput] = useState('');
+
+  const handleSubmit = () => {
+    if (input.trim()) {
+      onPost(input);
+      setInput('');
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-2">
+      <textarea
+        className="flex-1 p-2 border rounded resize-none min-h-[60px]"
+        placeholder="Share your thoughts..."
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+      />
+      <button
+        onClick={handleSubmit}
+        disabled={isLoading || input.trim() === ''}
+        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+      >
+        Post
+      </button>
+    </div>
+  );
+};
 
 const CommunityPage: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
